@@ -22,8 +22,18 @@ python run_project.py
 
 Open `notebooks/Customer_Intelligence_Support_Copilot.ipynb` and run cells from top to bottom. The notebook calls the same modules used by the scripts.
 
+## Streamlit web app
+Start the local dashboard from this directory after installing the requirements and preparing the data:
+
+```bash
+python -m streamlit run app.py
+```
+
+The app includes an operations overview, searchable order history, customer insights, a policy assistant, and ticket triage. It reads the local SQLite database and policy files; all records and model responses are synthetic/offline. Use **Refresh local data** in the sidebar after regenerating the database.
+
 ## Repository map
 - `generate_data.py`: deterministic fictional CSV and policy generation.
+- `app.py`: Streamlit dashboard and support copilot interface.
 - `mock_llm.py`: offline stand-in for classification, policy answers and agent tool calls.
 - `src/data_pipeline.py`: audit, clean, SQLite load, validation.
 - `src/customer_models.py`: RFM, K-means, PCA, lapse model with train/test separation.
