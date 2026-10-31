@@ -5,15 +5,28 @@ import sqlite3
 import pandas as pd
 import streamlit as st
 
-ROOT = Path(__file__).resolve().parent
-DB_PATH = ROOT / "data" / "instamart.db"
-SEGMENTS_PATH = ROOT / "outputs" / "customer_segments.csv"
-CHURN_PREDICTIONS_PATH = ROOT / "outputs" / "customers_churn_prediction.csv"
+import os
+import subprocess
+
+# 1. Get the directory of the current app.py file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# 2. Build the absolute path to the database
+DB_PATH = os.path.join(BASE_DIR, "instamart_customer_copilot_teaching_kit", "data", "instamart.db")
+
+# 3. Build the absolute path to the setup script
+SCRIPT_PATH = os.path.join(BASE_DIR, "run_project.py")
 
 # Automatically run the data build script if the database is missing
 if not os.path.exists(DB_PATH):
     print("Database missing. Running setup script...")
-    subprocess.run(["python", "run_project.py"], check=True)
+    subprocess.run(["python", SCRIPT_PATH], check=True)
+
+
+ROOT = Path(__file__).resolve().parent
+DB_PATH = ROOT / "data" / "instamart.db"
+SEGMENTS_PATH = ROOT / "outputs" / "customer_segments.csv"
+CHURN_PREDICTIONS_PATH = ROOT / "outputs" / "customers_churn_prediction.csv"
 
 st.set_page_config(
     page_title="Instamart | Customer Copilot",
