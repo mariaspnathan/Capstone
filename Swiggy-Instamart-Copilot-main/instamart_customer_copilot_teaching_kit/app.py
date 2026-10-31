@@ -10,6 +10,11 @@ DB_PATH = ROOT / "data" / "instamart.db"
 SEGMENTS_PATH = ROOT / "outputs" / "customer_segments.csv"
 CHURN_PREDICTIONS_PATH = ROOT / "outputs" / "customers_churn_prediction.csv"
 
+# Automatically run the data build script if the database is missing
+if not os.path.exists(DB_PATH):
+    print("Database missing. Running setup script...")
+    subprocess.run(["python", "run_project.py"], check=True)
+
 st.set_page_config(
     page_title="Instamart | Customer Copilot",
     page_icon="🛒",
