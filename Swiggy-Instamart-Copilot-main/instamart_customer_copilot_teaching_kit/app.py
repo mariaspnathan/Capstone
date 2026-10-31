@@ -8,6 +8,7 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parent
 DB_PATH = ROOT / "data" / "instamart.db"
 SEGMENTS_PATH = ROOT / "outputs" / "customer_segments.csv"
+CHURN_PREDICTIONS_PATH = ROOT / "outputs" / "customers_churn_prediction.csv"
 
 st.set_page_config(
     page_title="Instamart | Customer Copilot",
@@ -332,6 +333,118 @@ def render_customers(customers: pd.DataFrame, orders: pd.DataFrame) -> None:
         st.caption("Run `python run_project.py` to generate customer segment and lapse-model outputs.")
 
 
+def render_churn_predictions() -> None:
+    page_heading(
+        "CUSTOMER INTELLIGENCE",
+        "Churn predictions",
+        "Explore rule-based churn risk scores for the observed September 2025 cohort.",
+    )
+    st.info(
+        "These are deterministic, rule-based scores from the project's internal mock "
+        "API using pre-September behavior. They are illustrative risk indicators, "
+        "not a trained model or a forecast of future churn."
+    )
+    st.caption(
+        "Customers without completed orders before September 2025 are not included "
+        "because there is no prior purchase history to score."
+    )
+    if st.button("Generate / refresh predictions", type="primary", key="generate_churn"):
+        try:
+            from customers_churn_prediction import predict_customer_churn
+
+            with st.spinner("Scoring customers with the internal churn heuristic..."):
+                predictions, metrics = predict_customer_churn()
+            st.session_state["churn_predictions"] = predictions
+            st.session_state["churn_metrics"] = metrics
+        except (OSError, ValueError, RuntimeError) as error:
+            st.error(f"Could not generate customer churn predictions: {error}")
+
+    if "churn_predictions" in st.session_state:
+        predictions = st.session_state["churn_predictions"].copy()
+        metrics = st.session_state.get("churn_metrics", {})
+    elif CHURN_PREDICTIONS_PATH.exists():
+        try:
+            predictions = pd.read_csv(CHURN_PREDICTIONS_PATH)
+            metrics = {"scoring_method": "internal deterministic mock_llm heuristic"}
+        except (OSError, ValueError) as error:
+            st.error(f"Could not read the churn predictions CSV: {error}")
+            return
+    else:
+        st.caption("No churn prediction CSV exists yet. Generate it here or run `python customers_churn_prediction.py`.")
+        return
+
+    if predictions.empty:
+        st.warning("The churn predictions file contains no customer scores.")
+        return
+    probabilities = pd.to_numeric(predictions["churn_probability"], errors="coerce")
+    if probabilities.isna().any():
+        st.error("The churn predictions file contains invalid probability values.")
+        return
+
+    total, high_risk, predicted, average = st.columns(4)
+    total.metric("Customers scored", f"{len(predictions):,}")
+    high_risk.metric("High-risk customers", f"{predictions['risk_level'].eq('High').sum():,}")
+    predicted.metric("Predicted churn", f"{predictions['predicted_churn'].sum():,}")
+    average.metric("Average churn probability", f"{probabilities.mean():.1%}")
+    if "scoring_method" in metrics:
+        st.caption(f"Scoring method: {metrics['scoring_method']}.")
+
+    st.subheader("Customer risk distribution")
+    left, right = st.columns([1, 1.4])
+    with left:
+        st.bar_chart(
+            predictions["risk_level"]
+            .value_counts()
+            .reindex(["High", "Medium", "Low"], fill_value=0)
+            .rename("Customers"),
+            color="#147d52",
+            horizontal=True,
+        )
+    with right:
+        risk_filter = st.multiselect(
+            "Risk level",
+            ["High", "Medium", "Low"],
+            default=["High", "Medium", "Low"],
+        )
+        prediction_filter = st.selectbox(
+            "Prediction",
+            ["All customers", "Predicted churn", "Predicted active"],
+        )
+        filtered = predictions[predictions["risk_level"].isin(risk_filter)].copy()
+        if prediction_filter == "Predicted churn":
+            filtered = filtered[filtered["predicted_churn"].eq(1)]
+        elif prediction_filter == "Predicted active":
+            filtered = filtered[filtered["predicted_churn"].eq(0)]
+
+    display_columns = [
+        "customer_id",
+        "churn_probability",
+        "predicted_churn",
+        "risk_level",
+        "actual_churned_in_september_2025",
+    ]
+    st.dataframe(
+        filtered[display_columns].rename(
+            columns={
+                "customer_id": "Customer ID",
+                "churn_probability": "Churn probability",
+                "predicted_churn": "Predicted churn (1 = yes)",
+                "risk_level": "Risk level",
+                "actual_churned_in_september_2025": "Observed September churn",
+            }
+        ).style.format({"Churn probability": "{:.1%}"}),
+        hide_index=True,
+        width="stretch",
+        height=440,
+    )
+    st.download_button(
+        "Download filtered predictions",
+        data=filtered.to_csv(index=False).encode("utf-8"),
+        file_name="customers_churn_prediction.csv",
+        mime="text/csv",
+    )
+
+
 def render_support() -> None:
     page_heading("SUPPORT DESK", "Support copilot", "Grounded policy answers and privacy-aware ticket triage.")
     policy_tab, triage_tab = st.tabs(["Policy assistant", "Ticket triage"])
@@ -406,7 +519,7 @@ def main() -> None:
         )
         selection = st.radio(
             "WORKSPACE",
-            ["Overview", "Orders", "Customers", "Support copilot"],
+            ["Overview", "Orders", "Customers", "Churn predictions", "Support copilot"],
             label_visibility="visible",
         )
         st.divider()
@@ -429,6 +542,8 @@ def main() -> None:
         render_orders(orders)
     elif selection == "Customers":
         render_customers(customers, orders)
+    elif selection == "Churn predictions":
+        render_churn_predictions()
     else:
         render_support()
 

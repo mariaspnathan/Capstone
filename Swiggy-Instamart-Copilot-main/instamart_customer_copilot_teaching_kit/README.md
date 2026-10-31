@@ -34,6 +34,7 @@ The app includes an operations overview, searchable order history, customer insi
 ## Repository map
 - `generate_data.py`: deterministic fictional CSV and policy generation.
 - `app.py`: Streamlit dashboard and support copilot interface.
+- `customers_churn_prediction.py`: scores the churn cohort using the internal offline mock and writes customer-level risk scores.
 - `mock_llm.py`: offline stand-in for classification, policy answers and agent tool calls.
 - `src/data_pipeline.py`: audit, clean, SQLite load, validation.
 - `src/customer_models.py`: RFM, K-means, PCA, lapse model with train/test separation.
@@ -42,6 +43,8 @@ The app includes an operations overview, searchable order history, customer insi
 - `src/refund_agent.py`: order lookup, refund calculation, ledger and bounded tool loop.
 - `sql/queries.sql`: seven SQL learning patterns.
 - `outputs/`: generated artifacts; `state/`: agent checkpoint examples.
+
+Run `python customers_churn_prediction.py` after preparing the clean data to generate `outputs/customers_churn_prediction.csv`. Churn scores use the deterministic `mock_llm.predict_churn` internal API; this offline heuristic does not call external model APIs or use scikit-learn, and its risk probabilities are illustrative rather than trained-model estimates. The observed outcome follows the existing lapse-model window: customers with pre-September completed-order history are labeled by whether they placed a completed order during September 2025. The exported scores describe that historical cohort, not a forecast of future churn. `python run_project.py` runs this prediction stage at the end of the full pipeline.
 
 ## How students should learn the data-fetching flow
 1. `pd.read_csv("data/raw/orders.csv", keep_default_na=False)` loads local export rows. In a production project, a fetch function might download from an approved endpoint or query a warehouse, but this exercise intentionally uses local synthetic data and has no credentials.

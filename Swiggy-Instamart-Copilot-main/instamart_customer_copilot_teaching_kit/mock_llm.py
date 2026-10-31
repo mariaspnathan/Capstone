@@ -66,3 +66,45 @@ def chat(messages,tools=None):
     if "POLICY ASSISTANT" in head: return _policy(messages)
     if "AGENT" in head: return _agent(messages,tools)
     raise ValueError("first message must name CLASSIFY, POLICY ASSISTANT, or AGENT")
+
+def predict_churn(features):
+    """Return a deterministic, rule-based churn score using only local features."""
+    required = {
+        "recency",
+        "frequency",
+        "monetary",
+        "avg_discount",
+        "cancellation_rate",
+        "avg_delivery",
+        "tenure_days",
+    }
+    missing = required.difference(features)
+    if missing:
+        raise ValueError(f"Missing churn features: {', '.join(sorted(missing))}")
+
+    values = {name: float(features[name]) for name in required}
+    if not all(math.isfinite(value) for value in values.values()):
+        raise ValueError("Churn features must be finite numeric values.")
+    if values["recency"] < 0 or values["frequency"] < 0 or values["tenure_days"] < 0:
+        raise ValueError("Recency, frequency, and tenure must not be negative.")
+    if not 0 <= values["cancellation_rate"] <= 1:
+        raise ValueError("Cancellation rate must be between 0 and 1.")
+
+    # This transparent heuristic simulates an internal model; it is not trained.
+    log_odds = (
+        -0.4
+        + values["recency"] / 60
+        - values["frequency"] / 5
+        + 2 * values["cancellation_rate"]
+        + (values["avg_delivery"] - 30) / 60
+        - math.log1p(max(values["monetary"], 0)) / 10
+        - values["tenure_days"] / 1000
+        + values["avg_discount"] / 100
+    )
+    probability = 1 / (1 + math.exp(-max(-30, min(30, log_odds))))
+    risk_level = "High" if probability >= 0.6 else "Medium" if probability >= 0.3 else "Low"
+    return {
+        "churn_probability": probability,
+        "predicted_churn": int(probability >= 0.5),
+        "risk_level": risk_level,
+    }
