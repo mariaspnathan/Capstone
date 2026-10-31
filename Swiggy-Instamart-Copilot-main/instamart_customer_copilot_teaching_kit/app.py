@@ -20,6 +20,7 @@ CHURN_PREDICTIONS_PATH = ROOT / "outputs" / "customers_churn_prediction.csv"
 # 3. Check for the missing database once. If missing, generate it dynamically.
 if not DB_PATH.exists():
     print("Database file missing. Running run_project.py setup script...")
+else:
     if SCRIPT_PATH.exists():
         subprocess.run(["python", SCRIPT_PATH.as_posix()], check=True)
     else:
