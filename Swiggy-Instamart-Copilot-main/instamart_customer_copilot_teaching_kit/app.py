@@ -8,26 +8,23 @@ import streamlit as st
 import os
 import subprocess
 
-# 1. Get the directory of the current app.py file
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# 2. Build the absolute path to the database
-DB_PATH = os.path.join(BASE_DIR, "instamart_customer_copilot_teaching_kit", "data", "instamart.db")
-
-# 3. Build the absolute path to the setup script
-SCRIPT_PATH = os.path.join(BASE_DIR, "run_project.py")
-
-# Automatically run the data build script if the database is missing
-if not os.path.exists(DB_PATH):
-    print("Database missing. Running setup script...")
-    subprocess.run(["python", SCRIPT_PATH], check=True)
-
-
+# 1. Establish absolute baseline directories relative to this app.py file
 ROOT = Path(__file__).resolve().parent
+SCRIPT_PATH = ROOT / "run_project.py"
+
+# 2. Set the actual database and output paths your app uses
 DB_PATH = ROOT / "data" / "instamart.db"
 SEGMENTS_PATH = ROOT / "outputs" / "customer_segments.csv"
 CHURN_PREDICTIONS_PATH = ROOT / "outputs" / "customers_churn_prediction.csv"
 
+# 3. Check for the missing database once. If missing, generate it dynamically.
+if not DB_PATH.exists():
+    print("Database file missing. Running run_project.py setup script...")
+    if SCRIPT_PATH.exists():
+        subprocess.run(["python", SCRIPT_PATH.as_posix()], check=True)
+    else:
+        raise FileNotFoundError(f"Setup script not found at {SCRIPT_PATH}")
+        
 st.set_page_config(
     page_title="Instamart | Customer Copilot",
     page_icon="🛒",
