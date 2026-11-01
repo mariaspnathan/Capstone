@@ -157,7 +157,8 @@ def render_overview(customers: pd.DataFrame, orders: pd.DataFrame) -> None:
     st.markdown(
         """
         <div class="hero">
-            <h2>Good data. Better customer moments.</h2>
+            <h2>Masai Student AI-ML Project by Maria S.P. Nathan A.M.</h2>
+            <h4>Good data. Better customer moments.</h4>
             <p>Your operations snapshot, customer signals and support tools — all in one place.</p>
             <span class="hero-tag">● &nbsp;LOCAL DEMO · SYNTHETIC DATA</span>
         </div>
