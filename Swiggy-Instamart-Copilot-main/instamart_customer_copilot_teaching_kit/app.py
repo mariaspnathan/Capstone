@@ -7,6 +7,7 @@ import streamlit as st
 
 import os
 import subprocess
+import sys  # <-- 1. Make sure sys is imported at the top
 
 # 1. Establish absolute baseline directories relative to this app.py file
 ROOT = Path(__file__).resolve().parent
@@ -20,12 +21,12 @@ CHURN_PREDICTIONS_PATH = ROOT / "outputs" / "customers_churn_prediction.csv"
 # 3. Check for the missing database once. If missing, generate it dynamically.
 if not DB_PATH.exists():
     print("Database file missing. Running run_project.py setup script...")
-else:
     if SCRIPT_PATH.exists():
-        subprocess.run(["python", SCRIPT_PATH.as_posix()], check=True)
+        # 2. Change "python" to sys.executable so it copies the active venv environment pathways
+        subprocess.run([sys.executable, SCRIPT_PATH.as_posix()], check=True)
     else:
         raise FileNotFoundError(f"Setup script not found at {SCRIPT_PATH}")
-        
+
 st.set_page_config(
     page_title="Instamart | Customer Copilot",
     page_icon="🛒",
