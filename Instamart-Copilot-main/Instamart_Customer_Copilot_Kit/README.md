@@ -8,6 +8,8 @@ Students learn to (1) fetch/read CSV exports and audit data, (2) clean and persi
 ## Setup and run
 Python 3.11+ recommended.
 
+Run the below commands based on the OS (Windows/Linux)
+
 ```bash
 python -m venv .venv
 # Windows PowerShell:
