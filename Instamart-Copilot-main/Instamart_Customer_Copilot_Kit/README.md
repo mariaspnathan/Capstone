@@ -23,12 +23,9 @@ python run_project.py
 ## Streamlit web app
 The local dashboard in the browser will start automatically from this directory after installing the requirements and run_project.py:
 
-```bash
-python -m streamlit run app.py
-```
+The app includes an operations Overview, SQL Analysis for the examples in `sql/queries.sql`, searchable Product Master sourced from the SQLite `products` table, order history, customer insights, a policy assistant, and ticket triage. SQL examples run against the local SQLite database in read-only mode. All records and model responses are synthetic/offline. Use **Refresh local data** in the sidebar after regenerating the database.
 
-The app includes an operations overview, SQL Analysis for the examples in `sql/queries.sql`, searchable order history, a Product Master sourced from the SQLite `products` table, customer insights, a policy assistant, and ticket triage. SQL examples run against the local SQLite database in read-only mode. All records and model responses are synthetic/offline. Use **Refresh local data** in the sidebar after regenerating the database.
-
+## Jupyter notebook file is provide to run step by step code
 Open `notebooks/Customer_Intelligence_Support_Copilot.ipynb` and run cells from top to bottom. The notebook calls the same modules used by the scripts.
 
 ## Repository map
