@@ -7,7 +7,9 @@ Students learn to (1) fetch/read CSV exports and audit data, (2) clean and persi
 
 ## Setup and run
 Python 3.11+ recommended.
+
 Make sure you are in the Project folder (/Instamart_Customer_Copilot_Kit)
+
 Run the below commands based on the OS (Windows/Linux)
 
 ```bash
