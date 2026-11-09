@@ -11,11 +11,9 @@ Python 3.11+ recommended.
 Run the below commands based on the OS (Windows/Linux)
 
 ```bash
+# Windows
 python -m venv .venv
-# Windows PowerShell:
-.venv\Scripts\Activate.ps1
-# macOS/Linux:
-# source .venv/bin/activate
+call .venv\Scripts\activate.bat
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python generate_data.py
