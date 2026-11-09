@@ -17,15 +17,33 @@ python -m venv .venv
 # macOS/Linux:
 # source .venv/bin/activate
 python -m pip install --upgrade pip
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python generate_data.py
 python run_project.py
 ```
+## Note
+  All the functions in the PARTS (A to E) are called in the run_projects.py and step by step code can be run using jupyter notebook Customer_Intelligence_Support_Copilot.ipynb 
 
-## Streamlit web app
+## Make sure that the right Kernal and .venv folder selected to run the jupyter notebook to run. 
+For the notebook, open `notebooks/Customer_Intelligence_Support_Copilot.ipynb` in VS Code and choose **Select Kernel → Python Environments**. Select `Instamart_Customer_Copilot_Kit\.venv\Scripts\python.exe` (not a `.venv` at the outer workspace root), then run cells from top to bottom. The setup cell checks the active interpreter and derives the project root from that environment, so it does not depend on VS Code's current working directory.
+
+## Streamlit browser based web page database application
 The local dashboard in the browser will start automatically from this directory after installing the requirements and run_project.py:
 
 The app includes an operations Overview, SQL Analysis for the examples in `sql/queries.sql`, searchable Product Master sourced from the SQLite `products` table, order history, customer insights, a policy assistant, and ticket triage. SQL examples run against the local SQLite database in read-only mode. All records and model responses are synthetic/offline. Use **Refresh local data** in the sidebar after regenerating the database.
+left pane contains the below features to see the results in the right pane.
+  1. Overview - Summary of the metrics and charts
+  2. SQL Analysis - Run and test the sql on the tables resides in the instamart.db
+  3. Producs - Query all the records from the product master table and can be apply conditions and sorting.
+  4. Customers -  Query all the records and metrics from the Customer master table and can be apply conditions and sorting.
+  5. Orders - Query all the records and metrics from the Sales Order transactions table and can be apply conditions and sorting.
+  6. Customer Churn Prediction - View all the churn percentage for each customer and summary at top level.
+  7. Support Copilet - It has two tab pages
+   -  Policy assistant
+        User can ask questions related to policy documents in the provide window.
+   -  Ticket triage - It has two functions in the buttons
+       1. Run Ticket Tirage
+       2. Run Tirage Budget.
 
 ## Jupyter notebook file is provide to run step by step code
 Open `notebooks/Customer_Intelligence_Support_Copilot.ipynb` and run cells from top to bottom. The notebook calls the same modules used by the scripts.
@@ -83,6 +101,7 @@ These public repositories/documentation projects are useful for learning concept
 - Jupyter Notebook: https://github.com/jupyter/notebook — notebook workflow.
 - SQLite: https://github.com/sqlite/sqlite — SQL database engine (official mirror).
 - scikit-learn text feature extraction guide: https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction.
+- streamlit: libraries to build the browser based web pages database applications using python code
 
 ## Limitations and next steps
 - This is a teaching implementation and may need adjustment to match every numeric checkpoint in a strict grading rubric; compare actual outputs with the supplied brief and investigate differences rather than hardcoding expected answers.
