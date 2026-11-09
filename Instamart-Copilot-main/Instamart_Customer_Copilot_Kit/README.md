@@ -14,6 +14,7 @@ Run the below commands based on the OS (Windows/Linux)
 # Windows
 python -m venv .venv
 call .venv\Scripts\activate.bat
+# if powershell then remove call and run .venv\Scripts\activate.bat
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python generate_data.py
